@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="shortcut icon" href="../../docs-assets/ico/favicon.png">
+    <title>[$title]</title>
+    <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <link rel="shortcut icon" href="http://images.tfmeetpro.com/icon-16x16.png" />
+    <script src="js/jquery-1.11.0.min.js" type="text/javascript"></script>
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+</head>
+<!--DO NOT ERASE! VERSION:&MeetProTemplate_v1.6-->
+<body onload="init()">
+    <div class="container">
+        <div class="header">
+            <!-- your logo here-->
+            <div class="col-md-4">
+                <a href="http://elitetiming.net"><img class="logo" src="images/elitetiming.png" border=0></a>
+            </div>
+            <h3> [$name]</h3>
+            <h4> [$town]</h4>
+            <h5> [$date]</h5>
+        </div>
+
+        <div class="scoreboard">
+            <h3>Live Scoreboard</h3>
+            <div class="row justify-content-center" id="clock">00:00.00</div>
+            <h4 id="eventName">No Event Selected</h4>
+            <h5 id="details">
+                Heat:
+                <span id="eventHeat">0</span>
+                Wind:
+                <span id="eventWind">0</span>
+            </h5>
+            <div class="table-responsive">
+                <div id="results"></div>
+            </div>
+        </div>
+
+        <nav class="nav nav-pills nav-fill nav-justified">
+            <li>
+                <a data-toggle="pill" href="#scores">Jump to Team Scores</a>
+            </li>
+
+        </nav>
+
+        <div class="tab-content">
+            <div id="updResults" class="active" role="tabpanel">
+
+                <div class="row" style="min-height: 400px;">
+                    <div class="col-md-12">
+                        [$session_tables]
+                    </div>
+                </div><!-- row -->
+
+                <div class="row">
+                    <div id="scores">
+                        [$scores]
+                    </div>
+                </div><!-- row -->
+            </div>
+        </div>
+
+
+        <div class="pageDateStamp">
+            Generated at [$timestamp]
+        </div>
+        <div class="footer row">
+            <div class="addr col-md-6 col-xs-12">
+                <p>Elite Timing, LLC</p>
+                <p>
+                    Questions?
+                    <a href="http://elitetiming.net/contact-us/">Contact Us!</a>
+                </p>
+            </div>
+            <div class="icons col-md-6 col-xs-12">
+                <a target="blank" href="http://trackshack.com"><img src="images/trackshack.jpg" /></a>
+                <a target="blank" href="http://florida.usatf.org"><img src="images/usatf.png" /></a>
+                <a target="blank" href="http://tfmeetpro.com"><img src="images/da.png" /></a>
+                <a target="blank" href="http://finishlynx.com"><img src="images/lynx.png" /></a>
+                <a target="blank" href="http://fhsaa.com"><img src="images/fhsaa-logo.png" /></a>
+            </div>
+        </div>
+
+    </div><!-- Container -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"; import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js"; import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"; import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"; const firebaseConfig = { apiKey: "AIzaSyC0VzDBGtoEtldK-AXIEWd-qB2TBtzRwZI", authDomain: "mogo-live.firebaseapp.com", databaseURL: "https://mogo-live-default-rtdb.firebaseio.com", projectId: "mogo-live", storageBucket: "mogo-live.appspot.com", messagingSenderId: "796370044891", appId: "1:796370044891:web:597b8f018fb5cdd58389fe", measurementId: "G-VZQHQL19GC" }; const app = initializeApp(firebaseConfig); const db = getDatabase(app); const companyname = 'mogotiming'; const event = '100'; const timeRef = ref(db, 'timers/' + companyname + '/meets/' + event + '/scoreboard' + '/time'); onValue(timeRef, (snapshot) => { var clock = snapshot.val().time; $('#clock').text(clock); }); const resultRef = ref(db, 'timers/' + companyname + '/meets/' + event + '/scoreboard' + '/results'); onValue(resultRef, (doc) => { var obj = JSON.parse(doc.val().results); var htmlStr = ''; var athleteNum = 0; for (var key in obj) { if (obj.hasOwnProperty(key)) { athleteNum++; } } console.log(athleteNum); var eventName = obj[1][1]; $('#eventName').text(eventName); var eventWind = obj[1][2]; $('#eventWind').text(eventWind); var eventHeat = obj[1][5]; $('#eventHeat').text(eventHeat); htmlStr = htmlStr + '<table class="table" id="results">'; htmlStr = htmlStr + '<tr>' + '<th class="lane" scope="col">Place</th>' + '<th class="lane" scope="col">Hip</th>' + '<th class="number" scope="col">#</th>' + '<th class="name">Name</th>' + '<th class="team">Team</th>' + '<th class="delta">Final</th>' + '<th class="delta">Delta</th>' + '<th class="last">Last</th>' + '<th class="laps">Laps</th></tr>'; for (var i = 2; i < athleteNum; i++) {                 /*                 Not sure why this is necessary...                 A seemingly random number of results with ',' are being sent.                 Some events have a trailing result line with all elements undefined                 */                 if (obj[i][2] == ',' || obj[i][2] === undefined) { } else { htmlStr = htmlStr + "<tr>"; htmlStr = htmlStr + '<td class="place2 bg-danger" scope="row">' + obj[i][0] + "</td>"; htmlStr = htmlStr + '<td class="lane">' + obj[i][1] + "</td>"; htmlStr = htmlStr + '<td class="number">' + obj[i][2] + "</td>"; htmlStr = htmlStr + '<td class="name">' + obj[i][3] + "</td>"; htmlStr = htmlStr + '<td class="team"><i>' + obj[i][4] + "<i></td>"; htmlStr = htmlStr + '<td class="time">' + obj[i][5] + "</td>"; htmlStr = htmlStr + '<td class="delta">' + obj[i][6] + "</td>"; htmlStr = htmlStr + '<td class="last">' + obj[i][8] + "</td>"; htmlStr = htmlStr + '<td class="laps">' + obj[i][9] + "</td>"; htmlStr = htmlStr + "</tr>"; } } htmlStr = htmlStr + '</table>'; $('#results').html(htmlStr); }); 
+    </script>
+</body>
+</html>
+
+
+
+
+
