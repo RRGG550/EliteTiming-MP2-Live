@@ -89,8 +89,103 @@
     </div><!-- Container -->
   
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js"; import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js"; import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js"; import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js"; const firebaseConfig = { apiKey: "AIzaSyC0VzDBGtoEtldK-AXIEWd-qB2TBtzRwZI", authDomain: "mogo-live.firebaseapp.com", databaseURL: "https://mogo-live-default-rtdb.firebaseio.com", projectId: "mogo-live", storageBucket: "mogo-live.appspot.com", messagingSenderId: "796370044891", appId: "1:796370044891:web:597b8f018fb5cdd58389fe", measurementId: "G-VZQHQL19GC" }; const app = initializeApp(firebaseConfig); const db = getDatabase(app); const companyname = 'mogotiming'; const event = '16'; const timeRef = ref(db, 'timers/' + companyname + '/meets/' + event + '/scoreboard' + '/time'); onValue(timeRef, (snapshot) => { var clock = snapshot.val().time; $('#clock').text(clock); }); const resultRef = ref(db, 'timers/' + companyname + '/meets/' + event + '/scoreboard' + '/results'); onValue(resultRef, (doc) => { var obj = JSON.parse(doc.val().results); var htmlStr = ''; var athleteNum = 0; for (var key in obj) { if (obj.hasOwnProperty(key)) { athleteNum++; } } console.log(athleteNum); var eventName = obj[1][1]; $('#eventName').text(eventName); var eventWind = obj[1][2]; $('#eventWind').text(eventWind); var eventHeat = obj[1][5]; $('#eventHeat').text(eventHeat); htmlStr = htmlStr + '<table class="table" id="results">'; htmlStr = htmlStr + '<tr>' + '<th class="lane" scope="col">Place</th>' + '<th class="lane" scope="col">Hip</th>' + '<th class="number" scope="col">#</th>' + '<th class="name">Name</th>' + '<th class="team">Team</th>' + '<th class="delta">Final</th>' + '<th class="delta">Delta</th>' + '<th class="last">Last</th>' + '<th class="laps">Laps</th></tr>'; for (var i = 2; i < athleteNum; i++) {                 /*                 Not sure why this is necessary...                 A seemingly random number of results with ',' are being sent.                 Some events have a trailing result line with all elements undefined                 */                 if (obj[i][2] == ',' || obj[i][2] === undefined) { } else { htmlStr = htmlStr + "<tr>"; htmlStr = htmlStr + '<td class="place2 bg-danger" scope="row">' + obj[i][0] + "</td>"; htmlStr = htmlStr + '<td class="lane">' + obj[i][1] + "</td>"; htmlStr = htmlStr + '<td class="number">' + obj[i][2] + "</td>"; htmlStr = htmlStr + '<td class="name">' + obj[i][3] + "</td>"; htmlStr = htmlStr + '<td class="team"><i>' + obj[i][4] + "<i></td>"; htmlStr = htmlStr + '<td class="time">' + obj[i][5] + "</td>"; htmlStr = htmlStr + '<td class="delta">' + obj[i][6] + "</td>"; htmlStr = htmlStr + '<td class="last">' + obj[i][8] + "</td>"; htmlStr = htmlStr + '<td class="laps">' + obj[i][9] + "</td>"; htmlStr = htmlStr + "</tr>"; } } htmlStr = htmlStr + '</table>'; $('#results').html(htmlStr); }); 
-</script>  
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
+    import { getFirestore, doc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyC0VzDBGtoEtldK-AXIEWd-qB2TBtzRwZI",
+        authDomain: "mogo-live.firebaseapp.com",
+        databaseURL: "https://mogo-live-default-rtdb.firebaseio.com",
+        projectId: "mogo-live",
+        storageBucket: "mogo-live.appspot.com",
+        messagingSenderId: "796370044891",
+        appId: "1:796370044891:web:597b8f018fb5cdd58389fe",
+        measurementId: "G-VZQHQL19GC"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+
+
+    const companyname = 'mogotiming';
+    const event = '100';
+
+    const timeRef = ref(db, 'timers/' + companyname + '/meets/' + event + '/scoreboard' + '/time');
+    onValue(timeRef, (snapshot) => {
+        var clock = snapshot.val().time;
+        $('#clock').text(clock);
+    });
+
+    const resultRef = ref(db, 'timers/' + companyname + '/meets/' + event + '/scoreboard' + '/results');
+    onValue(resultRef, (doc) => {
+        var obj = JSON.parse(doc.val().results);
+        var htmlStr = '';
+        var athleteNum = 0;
+
+        for (var key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                athleteNum++;
+            }
+        }
+        console.log(athleteNum);
+
+        var eventName = obj[1][1];
+        $('#eventName').text(eventName);
+        var eventWind = obj[1][2];
+        $('#eventWind').text(eventWind);
+        var eventHeat = obj[1][5];
+        $('#eventHeat').text(eventHeat);
+        // start building html for results table
+        htmlStr = htmlStr + '<table class="table" id="results">';
+
+        // results table header
+        htmlStr = htmlStr + '<tr>' +
+            '<th class="lane" scope="col">Place</th>' +
+            '<th class="lane" scope="col">Hip</th>' +
+            '<th class="number" scope="col">#</th>' +
+            '<th class="name">Name</th>' +
+            '<th class="team">Team</th>' +
+            '<th class="delta">Final</th>' +
+            /*'<th class="delta">Delta</th>' +*/
+            '<th class="last">Last</th>' +
+            '<th class="laps">Laps</th></tr>';
+
+        for (var i = 2; i < athleteNum; i++) {
+            /*
+            Not sure why this is necessary...
+            A seemingly random number of results with ',' are being sent.
+            Some events have a trailing result line with all elements undefined
+            */
+            if (obj[i][2] == ',' || obj[i][2] === undefined) {
+
+            }
+            else {
+                htmlStr = htmlStr + "<tr>";
+                htmlStr = htmlStr + '<td class="place2 bg-danger" scope="row">' + obj[i][0] + "</td>";
+                htmlStr = htmlStr + '<td class="lane">' + obj[i][1] + "</td>";
+                htmlStr = htmlStr + '<td class="number">' + obj[i][2] + "</td>";
+                htmlStr = htmlStr + '<td class="name">' + obj[i][3] + "</td>";
+                htmlStr = htmlStr + '<td class="team"><i>' + obj[i][4] + "<i></td>";
+                htmlStr = htmlStr + '<td class="time">' + obj[i][5] + "</td>";
+                /*htmlStr = htmlStr + '<td class="delta">' + obj[i][6] + "</td>";*/
+                htmlStr = htmlStr + '<td class="last">' + obj[i][8] + "</td>";
+                htmlStr = htmlStr + '<td class="laps">' + obj[i][9] + "</td>";
+                htmlStr = htmlStr + "</tr>";
+            }
+        }
+        htmlStr = htmlStr + '</table>';
+
+        // update page with generated table
+        $('#results').html(htmlStr);
+    });
+
+  </script>  
 </body>
 </html>
 
